@@ -2,12 +2,12 @@ from ..utils.bench import bench
 
 
 @bench()
-def run(name: str, model: str, text: str, iters: int, warmup: int) -> None:
+def run(timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int) -> None:
     from ..utils.timer import BenchmarkTimer
 
     from kitoken import Kitoken
 
-    with BenchmarkTimer(name=name) as tm:
+    with BenchmarkTimer(name=name, output_dir=timings, compare_dir=compare) as tm:
         encoder: Kitoken = (
             Kitoken.from_sentencepiece_file(model)
             if model.endswith('.model')

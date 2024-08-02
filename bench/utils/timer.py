@@ -207,6 +207,7 @@ class Timings:
 class BenchmarkTimer:
     _timer: Timings
     _last_timer: Timings | None
+    _compare: Timings | None
     _name: str
     _print_summary: bool
     _last_unprinted_tmi: Optional['TimingIteration']
@@ -219,6 +220,7 @@ class BenchmarkTimer:
         name: str = 'Timing',
         print_summary: bool = True,
         output_dir: str = 'timings',
+        compare_dir: str | None = None,
     ) -> None:
         self._timer = Timings(name=name)
         self._name = name
@@ -231,6 +233,11 @@ class BenchmarkTimer:
             self._last_timer.name = 'last run'
         else:
             self._last_timer = None
+        if compare_dir:
+            self._compare = Timings.from_dir(name, compare_dir)
+            self._compare.name = os.path.basename(compare_dir)
+        else:
+            self._compare = None
 
     class TimingIteration:
         def __init__(
@@ -273,15 +280,18 @@ class BenchmarkTimer:
                 progress.refresh()
                 for i in range(n + warmup):
                     if i < warmup:
-                        progress.tasks[task].fields['avg'] = f'[dim]warming up: {i + 1}/{warmup}[/dim]'
+                        progress.tasks[task].fields['avg'] = f'[dim]warming up: {
+                            i + 1}/{warmup}[/dim]'
                         progress.refresh()
                     if floor((i - warmup) % 5) == 0 and i >= warmup:
                         progress.advance(task, 1)
                         progress.tasks[task].fields['avg'] = (
-                            f'[dim]avg: {self._timer.avg():.5f}s sum: {self._timer.sum():.5f}s[/dim]'
+                            f'[dim]avg: {self._timer.avg():.5f}s sum: {
+                                self._timer.sum():.5f}s[/dim]'
                         )
                         progress.refresh()
-                    self._last_unprinted_tmi = self.TimingIteration(self, i, i < warmup)
+                    self._last_unprinted_tmi = self.TimingIteration(
+                        self, i, i < warmup)
                     yield self._last_unprinted_tmi
                 progress.advance(task, 1)
                 progress.refresh()
@@ -303,6 +313,8 @@ class BenchmarkTimer:
         self._timer.print_timings()
         if self._last_timer:
             self._timer.print_timings_compare(self._last_timer)
+        if self._compare:
+            self._timer.print_timings_compare(self._compare)
         if exc_type is None and self._output_dir:
             self._timer.write_timings(self._output_dir)
         if exc_type is not None:

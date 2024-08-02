@@ -6,6 +6,7 @@ import functools
 import gc
 import logging
 import operator
+import os
 
 from multiprocessing import Process  # type: ignore
 from time import sleep
@@ -55,6 +56,20 @@ if __name__ == '__main__':
         nargs='+',
         help='Select datasets. Will run all if not specified.',
         type=str,
+    )
+    argparser_general.add_argument(
+        '--timings-dir',
+        '-o',
+        type=str,
+        help='Output directory for timings. (default: "timings")',
+        default='timings',
+    )
+    argparser_general.add_argument(
+        '--compare-dir',
+        '-c',
+        type=str,
+        help='Directory with timings to compare to. (default: None)',
+        default=None,
     )
     argparser_general.add_argument(
         '--list-models',
@@ -236,8 +251,13 @@ if __name__ == '__main__':
                         continue
                     console.print(f'[blue bold]{tok} - {model} - {name}[/]')
                     timings = Timings.from_dir(
-                        f'{tok} - {model} - {name}', 'timings')
+                        f'{tok} - {model} - {name}', args.timings_dir)
                     timings.print_timings()
+                    if args.compare_dir:
+                        compare = Timings.from_dir(
+                            f'{tok} - {model} - {name}', args.compare_dir)
+                        compare.name = os.path.basename(args.compare_dir)
+                        timings.print_timings_compare(compare)
         exit(0)
 
     console.print('[bold]Running benchmarks...[/]')
@@ -275,12 +295,17 @@ if __name__ == '__main__':
                             continue
                         fn = tokenizers[tok]
                         if not args.multiprocessing:
-                            fn(f'{tok} - {model} - {name}',
-                               str(params['model']), file, 100, 15)
+                            fn(
+                                args.timings_dir, args.compare_dir,
+                                f'{tok} - {model} - {name}',
+                                str(params['model']), file, 100, 15
+                            )
                         else:
                             p = Process(
                                 target=fn, args=(
-                                    f'{tok} - {model} - {name}', str(params['model']), file, 100, 15)
+                                    args.timings_dir, args.compare_dir,
+                                    f'{tok} - {model} - {name}',
+                                    str(params['model']), file, 100, 15)
                             )
                             p.start()
                             result = p.join(timeout=args.timeout)
