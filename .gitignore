@@ -19,6 +19,7 @@ Pipfile.lock
 pdm.lock
 requirements.lock
 requirements-dev.lock
+uv.lock
 
 /*tmp*
 /*temp*
