@@ -54,7 +54,8 @@ def bench() -> Callable[..., BenchFunc]:
 
 
 def run_bench_kitoken(
-        timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int) -> None:
+    timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
+) -> None:
     from ..benches.kitoken import run
 
     text = open(text, encoding='utf-8', newline='\n').read()
@@ -62,7 +63,8 @@ def run_bench_kitoken(
 
 
 def run_bench_tiktoken(
-        timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int) -> None:
+    timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
+) -> None:
     from ..benches.tiktoken import run
 
     text = open(text, encoding='utf-8', newline='\n').read()
@@ -70,7 +72,8 @@ def run_bench_tiktoken(
 
 
 def run_bench_sentencepiece(
-        timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int) -> None:
+    timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
+) -> None:
     from ..benches.sentencepiece import run
 
     text = open(text, encoding='utf-8', newline='\n').read()
@@ -78,7 +81,8 @@ def run_bench_sentencepiece(
 
 
 def run_bench_tokenizers(
-        timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int) -> None:
+    timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
+) -> None:
     from ..benches.tokenizers import run
 
     text = open(text, encoding='utf-8', newline='\n').read()
@@ -86,7 +90,8 @@ def run_bench_tokenizers(
 
 
 def run_bench_tekken(
-        timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int) -> None:
+    timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
+) -> None:
     from ..benches.tekken import run
 
     text = open(text, encoding='utf-8', newline='\n').read()
@@ -94,7 +99,8 @@ def run_bench_tekken(
 
 
 def run_bench_gptbpe(
-        timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int) -> None:
+    timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
+) -> None:
     from ..benches.gptbpe import run
 
     text = open(text, encoding='utf-8', newline='\n').read()
@@ -102,7 +108,8 @@ def run_bench_gptbpe(
 
 
 def run_bench_llamacpp(
-        timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int) -> None:
+    timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
+) -> None:
     from ..benches.llamacpp import run
 
     text = open(text, encoding='utf-8', newline='\n').read()
@@ -173,6 +180,18 @@ benchmarks = OrderedDict([
             'model': 'models/llama-2-7b.Q2_K.gguf',
             'slow': ['pride and prejudice'],
             'inf': ['utf8 sequence'],
+        }),
+    ])),
+    ('llama3', OrderedDict([
+        ('kitoken', {
+            'model': 'models/llama3-alt.json',
+            'slow': [],
+            'inf': [],
+        }),
+        ('tokenizers', {
+            'model': 'models/llama3-alt.json',
+            'slow': [],
+            'inf': [],
         }),
     ])),
     ('cl100k', OrderedDict([

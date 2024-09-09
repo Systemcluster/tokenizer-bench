@@ -26,7 +26,7 @@ if __name__ == '__main__':
         prog='tokenizer-generator',
         description='Generator for tokenization test data.',
         add_help=False,
-        formatter_class=RichHelpFormatter
+        formatter_class=RichHelpFormatter,
     )
     argparser.add_argument('--log-level', type=str,
                            help='Log level. (default: INFO)', default='INFO')
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     logging.basicConfig(
         level=args.log_level.upper(),
-        format='%(message)s',
+        format='[%(module)s] %(message)s',
         datefmt='[%X]',
         handlers=[RichHandler(rich_tracebacks=True)],
     )
@@ -85,7 +85,7 @@ if __name__ == '__main__':
             with open(f'outputs/{model}/{data}_tokens_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                 f.writelines(lines_tokens)
             if len(lines) != len(lines_decoded) or text != text_decoded:
-                print(f'{model}: {name}: {data}_input.txt: {len(lines)} != {
+                logger.info(f'{model}: {name}: {data}_input.txt: {len(lines)} != {
                     len(lines_decoded)} or lines not equal')
                 with open(f'outputs/{model}/{data}_output_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                     f.write(text_decoded)
@@ -100,7 +100,7 @@ if __name__ == '__main__':
             with open(f'outputs/{model}/{data}_tokens_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                 f.write(', '.join([str(token) for token in output]))
             if len(decoded) != len(text) or text != decoded:
-                print(f'{model}: {name}: {data}_input.txt: {len(text)} != {
+                logger.info(f'{model}: {name}: {data}_input.txt: {len(text)} != {
                     len(decoded)} or text not equal')
                 with open(f'outputs/{model}/{data}_output_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                     f.write(decoded)
@@ -128,6 +128,7 @@ if __name__ == '__main__':
 
             models = glob.glob('models/tests/*.json')
             for model in models:
+                print(model)
                 name = os.path.basename(model).split('.')[0]
                 with open(model, encoding='utf-8') as f:
                     text = f.read()
@@ -184,25 +185,33 @@ if __name__ == '__main__':
                     if text.find('"version": "v3"') == -1:
                         continue
                 str.replace(text, '\n', '\\n')
-                encoder = MistralTokenizer.from_file('models/tekken_nemo.json')
+                encoder = MistralTokenizer.from_file(model)
                 gen_lines(
                     'tekken',
                     name,
-                    lambda i, encoder=encoder:
-                        cast(list[int], encoder.instruct_tokenizer.tokenizer.encode(
-                            i, False, False)),
+                    lambda i, encoder=encoder: cast(
+                        list[int], encoder.instruct_tokenizer.tokenizer.encode(
+                            i, False, False)
+                    ),
                     lambda i, encoder=encoder: encoder.decode(i),
                 )
                 gen_full(
                     'tekken',
                     name,
-                    lambda i, encoder=encoder:
-                        cast(list[int], encoder.instruct_tokenizer.tokenizer.encode(
-                            i, False, False)),
+                    lambda i, encoder=encoder: cast(
+                        list[int], encoder.instruct_tokenizer.tokenizer.encode(
+                            i, False, False)
+                    ),
                     lambda i, encoder=encoder: encoder.decode(i),
                 )
 
+        # workaround for github.com/mistralai/mistral-common/pull/33
+        import builtins
+        open_ = builtins.open
+        builtins.open = lambda *args, **kwargs: open_(
+            *args, **{k: v for k, v in kwargs.items() if k != 'encoding'}, encoding='utf-8')
         tekken()
+        builtins.open = open_
 
     except KeyboardInterrupt:
         print('Interrupted')
