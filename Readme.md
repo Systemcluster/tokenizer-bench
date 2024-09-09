@@ -65,7 +65,7 @@ To generate encoding and decoding results for tokenizer implementations, run the
 python -m generate
 ```
 
-This will encode and decode the test data with all tokenizers and save the results in the `outputs` directory.
+This will encode and decode the test data with all tokenizers in the `models` directory and save the results in the `outputs` directory.
 
 ## Details
 
@@ -81,13 +81,17 @@ A selection of results is published in the [Kitoken](https://github.com/Systemcl
 
 The following tokenizers are included in this benchmark:
 
-- [Kitoken](https://github.com/Systemcluster/kitoken) <sup>not yet published</sup>
-- [SentencePiece](https://github.com/google/sentencepiece) *(doesn't complete `UTF-8 Sequence` with some models)*
+- [Kitoken](https://github.com/Systemcluster/kitoken)
+- [SentencePiece](https://github.com/google/sentencepiece) <sup>1</sup>
 - [Tokenizers](https://github.com/huggingface/tokenizers)
-- [Tiktoken](https://github.com/openai/tiktoken) *(doesn't complete `UTF-8 Sequence` unless raising timeout)*
-- [Tekken](https://docs.mistral.ai/guides/tokenization) *(uses Tiktoken internally)*
-- [gpt_bpe](https://github.com/wbrown/gpt_bpe) *(doesn't complete `UTF-8 Sequence` with some models)*
-- [llama.cpp](https://github.com/ggerganov/llama.cpp) *(optional, very slow, doesn't complete `UTF-8 Sequence`)*
+- [Tiktoken](https://github.com/openai/tiktoken) <sup>2</sup>
+- [Tekken](https://docs.mistral.ai/guides/tokenization) <sup>uses Tiktoken internally</sup>
+- [gpt_bpe](https://github.com/wbrown/gpt_bpe) <sup>1</sup>
+- [llama.cpp](https://github.com/ggerganov/llama.cpp) <sup>2, optional, very slow</sup>
+
+<sup>1: doesn't complete `UTF-8 Sequence` with some models</sup>\
+<sup>2: doesn't complete `UTF-8 Sequence` with any model unless raising timeout</sub>
+<sup></sub>
 
 This benchmark does not verify the correctness of tokenization results. Some tokenizers targeting the same model as others might produce different results for the same inputs. Use the test data generation utility to compare outputs manually if needed.
 
