@@ -26,12 +26,10 @@ if __name__ == '__main__':
         prog='tokenizer-generator',
         description='Generator for tokenization test data.',
         add_help=False,
-        formatter_class=RichHelpFormatter
+        formatter_class=RichHelpFormatter,
     )
-    argparser.add_argument('--log-level', type=str,
-                           help='Log level. (default: INFO)', default='INFO')
-    argparser.add_argument('--help', '-h', action='help',
-                           help='Show this help message and exit.')
+    argparser.add_argument('--log-level', type=str, help='Log level. (default: INFO)', default='INFO')
+    argparser.add_argument('--help', '-h', action='help', help='Show this help message and exit.')
     args = argparser.parse_args()
     console.print('[dim]Arguments:[/dim]', vars(args))
 
@@ -47,19 +45,18 @@ if __name__ == '__main__':
 
     logging.basicConfig(
         level=args.log_level.upper(),
-        format='%(message)s',
+        format='[%(module)s] %(message)s',
         datefmt='[%X]',
         handlers=[RichHandler(rich_tracebacks=True)],
     )
 
-    os.environ['TOKENIZERS_LOG'] = str.replace(
-        args.log_level.lower(), 'critical', 'off').removesuffix('ing')
+    os.environ['TOKENIZERS_LOG'] = str.replace(args.log_level.lower(), 'critical', 'off').removesuffix('ing')
 
     def gen_lines(
         model: str, name: str, encode: Callable[[str], list[int]], decode: Callable[[list[int]], str]
     ) -> None:
         for data in ['small', 'mixed']:
-            text = open(f'data/{data}_input.txt', encoding='utf-8').read()
+            text = open(f'data/{data}_input.txt', encoding='utf-8', newline='\n').read()
             lines = text.strip('\n').split('\n')
             lines_tokens = []
             lines_decoded = []
@@ -69,8 +66,7 @@ if __name__ == '__main__':
                     continue
                 line = line.replace('\\n', '\n').replace('\\s', ' ')
                 output = encode(line)
-                lines_tokens.append(
-                    ', '.join([str(token) for token in output]))
+                lines_tokens.append(', '.join([str(token) for token in output]))
                 lines_tokens.append('\n')
                 decoded = decode(output)
                 decoded = decoded.replace('\n', '\\n')
@@ -85,23 +81,41 @@ if __name__ == '__main__':
             with open(f'outputs/{model}/{data}_tokens_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                 f.writelines(lines_tokens)
             if len(lines) != len(lines_decoded) or text != text_decoded:
-                print(f'{model}: {name}: {data}_input.txt: {len(lines)} != {
-                    len(lines_decoded)} or lines not equal')
+                logger.info(
+                    f'{model}: {name}: {data}_input.txt: {len(lines)} != {
+                        len(lines_decoded)} or lines not equal'
+                )
+                if len(lines) < 100:
+                    diff_between_text_and_decoded = [
+                        (i, text_line, decoded_line)
+                        for i, (text_line, decoded_line) in enumerate(zip(lines, lines_decoded, strict=False))
+                        if text_line != decoded_line
+                    ]
+                    if diff_between_text_and_decoded:
+                        logger.info('Differences between text and decoded:')
+                        for i, text_line, decoded_line in diff_between_text_and_decoded:
+                            logger.info(rf'{i}: {text_line!r} != {decoded_line!r}')
                 with open(f'outputs/{model}/{data}_output_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                     f.write(text_decoded)
 
     def gen_full(model: str, name: str, encode: Callable[[str], list[int]], decode: Callable[[list[int]], str]) -> None:
         for data in ['utf8']:
-            text = open(
-                f'data/{data}_input.txt', encoding='utf-8').read().replace('\\n', '\n').replace('\\s', ' ')
+            text = (
+                open(f'data/{data}_input.txt', encoding='utf-8', newline='\n')
+                .read()
+                .replace('\\n', '\n')
+                .replace('\\s', ' ')
+            )
             output = encode(text)
             decoded = decode(output)
             os.makedirs(f'outputs/{model}', exist_ok=True)
             with open(f'outputs/{model}/{data}_tokens_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                 f.write(', '.join([str(token) for token in output]))
             if len(decoded) != len(text) or text != decoded:
-                print(f'{model}: {name}: {data}_input.txt: {len(text)} != {
-                    len(decoded)} or text not equal')
+                logger.info(
+                    f'{model}: {name}: {data}_input.txt: {len(text)} != {
+                        len(decoded)} or text not equal'
+                )
                 with open(f'outputs/{model}/{data}_output_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                     f.write(decoded)
 
@@ -113,13 +127,12 @@ if __name__ == '__main__':
 
             models = glob.glob('models/tests/*.model')
             for model in models:
+                console.print(f'[bold]{model}[/bold] [dim](sentencepiece)[/dim]')
                 name = os.path.basename(model).split('.')[0]
                 encoder: SentencePieceProcessor = SentencePieceProcessor()
                 encoder.Load(model)
-                gen_lines('sentencepiece', name,
-                          encoder.EncodeAsIds, encoder.Decode)
-                gen_full('sentencepiece', name,
-                         encoder.EncodeAsIds, encoder.Decode)
+                gen_lines('sentencepiece', name, encoder.EncodeAsIds, encoder.Decode)
+                gen_full('sentencepiece', name, encoder.EncodeAsIds, encoder.Decode)
 
         sentencepiece()
 
@@ -128,6 +141,7 @@ if __name__ == '__main__':
 
             models = glob.glob('models/tests/*.json')
             for model in models:
+                console.print(f'[bold]{model}[/bold] [dim](tokenizers)[/dim]')
                 name = os.path.basename(model).split('.')[0]
                 with open(model, encoding='utf-8') as f:
                     text = f.read()
@@ -139,18 +153,14 @@ if __name__ == '__main__':
                 gen_lines(
                     'tokenizers',
                     name,
-                    lambda i, encoder=encoder: cast(
-                        Encoding, encoder.encode(i, add_special_tokens=False)).ids,
-                    lambda i, encoder=encoder: encoder.decode(
-                        i, skip_special_tokens=False),
+                    lambda i, encoder=encoder: cast(Encoding, encoder.encode(i, add_special_tokens=False)).ids,
+                    lambda i, encoder=encoder: encoder.decode(i, skip_special_tokens=False),
                 )
                 gen_full(
                     'tokenizers',
                     name,
-                    lambda i, encoder=encoder: cast(
-                        Encoding, encoder.encode(i, add_special_tokens=False)).ids,
-                    lambda i, encoder=encoder: encoder.decode(
-                        i, skip_special_tokens=False),
+                    lambda i, encoder=encoder: cast(Encoding, encoder.encode(i, add_special_tokens=False)).ids,
+                    lambda i, encoder=encoder: encoder.decode(i, skip_special_tokens=False),
                 )
 
         tokenizers()
@@ -160,13 +170,13 @@ if __name__ == '__main__':
 
             models = glob.glob('models/tests/*.tiktoken')
             for model in models:
+                console.print(f'[bold]{model}[/bold] [dim](tiktoken)[/dim]')
                 name = os.path.basename(model).split('.')[0]
                 encoder: Encoding = get_encoding(name)
                 gen_lines(
                     'tiktoken',
                     name,
-                    lambda i, encoder=encoder: encoder.encode(
-                        i, allowed_special='all'),
+                    lambda i, encoder=encoder: encoder.encode(i, allowed_special='all'),
                     encoder.decode,
                 )
                 gen_full('tiktoken', name, encoder.encode, encoder.decode)
@@ -178,31 +188,40 @@ if __name__ == '__main__':
 
             models = glob.glob('models/tests/*.json')
             for model in models:
+                console.print(f'[bold]{model}[/bold] [dim](tekken)[/dim]')
                 name = os.path.basename(model).split('.')[0]
                 with open(model, encoding='utf-8') as f:
                     text = f.read()
                     if text.find('"version": "v3"') == -1:
                         continue
                 str.replace(text, '\n', '\\n')
-                encoder = MistralTokenizer.from_file('models/tekken_nemo.json')
+                encoder = MistralTokenizer.from_file(model)
                 gen_lines(
                     'tekken',
                     name,
-                    lambda i, encoder=encoder:
-                        cast(list[int], encoder.instruct_tokenizer.tokenizer.encode(
-                            i, False, False)),
+                    lambda i, encoder=encoder: cast(
+                        list[int], encoder.instruct_tokenizer.tokenizer.encode(i, False, False)
+                    ),
                     lambda i, encoder=encoder: encoder.decode(i),
                 )
                 gen_full(
                     'tekken',
                     name,
-                    lambda i, encoder=encoder:
-                        cast(list[int], encoder.instruct_tokenizer.tokenizer.encode(
-                            i, False, False)),
+                    lambda i, encoder=encoder: cast(
+                        list[int], encoder.instruct_tokenizer.tokenizer.encode(i, False, False)
+                    ),
                     lambda i, encoder=encoder: encoder.decode(i),
                 )
 
+        # workaround for github.com/mistralai/mistral-common/pull/33
+        import builtins
+
+        open_ = builtins.open
+        builtins.open = lambda *args, **kwargs: open_(
+            *args, **{k: v for k, v in kwargs.items() if k != 'encoding'}, encoding='utf-8'
+        )
         tekken()
+        builtins.open = open_
 
     except KeyboardInterrupt:
         print('Interrupted')

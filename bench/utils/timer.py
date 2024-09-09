@@ -285,13 +285,10 @@ class BenchmarkTimer:
                         progress.refresh()
                     if floor((i - warmup) % 5) == 0 and i >= warmup:
                         progress.advance(task, 1)
-                        progress.tasks[task].fields['avg'] = (
-                            f'[dim]avg: {self._timer.avg():.5f}s sum: {
+                        progress.tasks[task].fields['avg'] = f'[dim]avg: {self._timer.avg():.5f}s sum: {
                                 self._timer.sum():.5f}s[/dim]'
-                        )
                         progress.refresh()
-                    self._last_unprinted_tmi = self.TimingIteration(
-                        self, i, i < warmup)
+                    self._last_unprinted_tmi = self.TimingIteration(self, i, i < warmup)
                     yield self._last_unprinted_tmi
                 progress.advance(task, 1)
                 progress.refresh()
