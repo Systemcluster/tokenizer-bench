@@ -11,12 +11,12 @@ dependencies = [
     # "kitoken", # vendored
     # "gpt_bpe", # vendored
     "sentencepiece>=0.2.0",
-    "tokenizers>=0.19.1",
+    "tokenizers>=0.20.0",
     "tiktoken>=0.7.0",
-    "mistral-common>=1.3.3",
-    "scipy>=1.14.0",
+    "mistral-common>=1.3.4",
+    "scipy>=1.14.1",
     "numpy",
-    "rich>=13.7.0",
+    "rich>=13.8.0",
     "rich-argparse>=1.5.2",
     "pip>=24.2",
     "pywin32>=306; platform_system=='Windows'",
