@@ -8,24 +8,24 @@ Utility to compare the performance of different tokenizers with different datase
 
 ## Installation
 
-Clone the repository and install the dependencies. Python and a package manager of choice have to be installed. Examples are given for [pdm](https://pdm-project.org) and [rye](https://rye.astral.sh/).
+Clone the repository and install the dependencies. Python and a package manager of choice have to be installed. Examples are given for [pdm](https://pdm-project.org) and [uv](https://docs.astral.sh/uv).
 
 ```shell
 git clone https://github.com/Systemcluster/tokenizer-bench
 cd tokenizer-bench
-pdm install # or rye sync
+pdm install # or uv sync
 ```
 
 This will install a common subset of tokenizers. To install all tokenizers, install the optional dependencies.
 
 ```shell
-pdm install -G :all # or rye sync --all-features
+pdm install -G :all # or uv sync --all-extras
 ```
 
 ## Usage
 
 >[!NOTE]
->Commands given in this section omit `pdm run`, `rye run` or your command of choice to run Python in a virtual environment.
+>Commands given in this section omit `pdm run`, `uv run` or your command of choice to run Python in a virtual environment.
 
 ### Running benchmarks
 

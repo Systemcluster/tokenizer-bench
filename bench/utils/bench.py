@@ -98,6 +98,15 @@ def run_bench_tekken(
     run(timings, compare, name, model, text, iters, warmup)
 
 
+def run_bench_meta(
+    timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
+) -> None:
+    from ..benches.meta import run
+
+    text = open(text, encoding='utf-8', newline='\n').read()
+    run(timings, compare, name, model, text, iters, warmup)
+
+
 def run_bench_gptbpe(
     timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
 ) -> None:
@@ -128,6 +137,7 @@ tokenizers = OrderedDict([
     ('sentencepiece', run_bench_sentencepiece),
     ('tokenizers', run_bench_tokenizers),
     ('tekken', run_bench_tekken),
+    ('meta', run_bench_meta),
     ('gpt_bpe', run_bench_gptbpe),
     ('llamacpp', run_bench_llamacpp),
 ])  # fmt: skip
@@ -198,6 +208,23 @@ benchmarks = OrderedDict([
         ('kitoken', {
             'model': 'models/llama33.json',
             'slow': [],
+            'inf': [],
+        }),
+        ('tokenizers', {
+            'model': 'models/llama33.json',
+            'slow': [],
+            'inf': [],
+        }),
+    ])),
+    ('llama4', OrderedDict([
+        ('kitoken', {
+            'model': 'models/llama4.meta',
+            'slow': [],
+            'inf': [],
+        }),
+        ('meta', {
+            'model': 'models/llama4.meta',
+            'slow': ['utf8 sequence'],
             'inf': [],
         }),
         ('tokenizers', {

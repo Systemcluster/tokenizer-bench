@@ -36,10 +36,9 @@ if __name__ == '__main__':
     # verify log level
     if args.log_level not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
         console.print(
-            f'[red]Invalid log level, must be one of[/] {"[dim], [/]".join(
-                [f"[bold]{x}[/]" for x in logging.getLevelNamesMapping()
-                 if x != "NOTSET"]
-            )}'
+            f'[red]Invalid log level, must be one of[/] {
+                "[dim], [/]".join([f"[bold]{x}[/]" for x in logging.getLevelNamesMapping() if x != "NOTSET"])
+            }'
         )
         exit(1)
 
@@ -82,8 +81,7 @@ if __name__ == '__main__':
                 f.writelines(lines_tokens)
             if len(lines) != len(lines_decoded) or text != text_decoded:
                 logger.info(
-                    f'{model}: {name}: {data}_input.txt: {len(lines)} != {
-                        len(lines_decoded)} or lines not equal'
+                    f'{model}: {name}: {data}_input.txt: {len(lines)} != {len(lines_decoded)} or lines not equal'
                 )
                 if len(lines) < 100:
                     diff_between_text_and_decoded = [
@@ -98,7 +96,15 @@ if __name__ == '__main__':
                 with open(f'outputs/{model}/{data}_output_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                     f.write(text_decoded)
 
-    def gen_full(model: str, name: str, encode: Callable[[str], list[int]], decode: Callable[[list[int]], str]) -> None:
+    def gen_full(
+        model: str,
+        name: str,
+        encode: Callable[
+            [str],
+            list[int],
+        ],
+        decode: Callable[[list[int]], str],
+    ) -> None:
         for data in ['utf8']:
             text = (
                 open(f'data/{data}_input.txt', encoding='utf-8', newline='\n')
@@ -112,10 +118,7 @@ if __name__ == '__main__':
             with open(f'outputs/{model}/{data}_tokens_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                 f.write(', '.join([str(token) for token in output]))
             if len(decoded) != len(text) or text != decoded:
-                logger.info(
-                    f'{model}: {name}: {data}_input.txt: {len(text)} != {
-                        len(decoded)} or text not equal'
-                )
+                logger.info(f'{model}: {name}: {data}_input.txt: {len(text)} != {len(decoded)} or text not equal')
                 with open(f'outputs/{model}/{data}_output_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
                     f.write(decoded)
 
@@ -182,6 +185,29 @@ if __name__ == '__main__':
                 gen_full('tiktoken', name, encoder.encode, encoder.decode)
 
         tiktoken()
+
+        def meta() -> None:
+            from llama_models.llama4.tokenizer import Tokenizer
+
+            models = glob.glob('models/tests/*.meta')
+            for model in models:
+                console.print(f'[bold]{model}[/bold] [dim](meta)[/dim]')
+                name = os.path.basename(model).split('.')[0]
+                encoder: Tokenizer = Tokenizer(model)
+                gen_lines(
+                    'meta',
+                    name,
+                    lambda i, encoder=encoder: encoder.encode(i, allowed_special='all', bos=False, eos=False),
+                    lambda i, encoder=encoder: encoder.decode(i),
+                )
+                gen_full(
+                    'meta',
+                    name,
+                    lambda i, encoder=encoder: encoder.encode(i, bos=False, eos=False),
+                    lambda i, encoder=encoder: encoder.decode(i),
+                )
+
+        meta()
 
         def tekken() -> None:
             from mistral_common.tokens.tokenizers.mistral import MistralTokenizer
