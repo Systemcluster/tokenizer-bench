@@ -6,6 +6,7 @@ import logging
 import os
 
 from collections.abc import Callable
+from pathlib import Path
 from typing import cast
 
 from rich.console import Console
@@ -144,12 +145,12 @@ if __name__ == '__main__':
 
             models = glob.glob('models/tests/*.json')
             for model in models:
-                console.print(f'[bold]{model}[/bold] [dim](tokenizers)[/dim]')
                 name = os.path.basename(model).split('.')[0]
                 with open(model, encoding='utf-8') as f:
                     text = f.read()
                     if text.find('"version": "v3"') != -1:
                         continue
+                console.print(f'[bold]{model}[/bold] [dim](tokenizers)[/dim]')
                 str.replace(text, '\n', '\\n')
                 encoder: Tokenizer = Tokenizer.from_file(model)
                 encoder.encode_special_tokens = False  # type: ignore
@@ -167,6 +168,30 @@ if __name__ == '__main__':
                 )
 
         tokenizers()
+
+        def kimi() -> None:
+            from vendor.kimi import TikTokenTokenizer
+
+            models = glob.glob('models/tests/*.kimi')
+            for model in models:
+                console.print(f'[bold]{model}[/bold] [dim](tokenizers)[/dim]')
+                name = os.path.basename(model).split('.')[0]
+                encoder: TikTokenTokenizer = TikTokenTokenizer(model)
+                encoder.encode_special_tokens = False  # type: ignore
+                gen_lines(
+                    'kimi',
+                    name,
+                    lambda i, encoder=encoder: encoder.encode(i, add_special_tokens=False),
+                    lambda i, encoder=encoder: encoder.decode(i, skip_special_tokens=False),
+                )
+                gen_full(
+                    'kimi',
+                    name,
+                    lambda i, encoder=encoder: encoder.encode(i, add_special_tokens=False),
+                    lambda i, encoder=encoder: encoder.decode(i, skip_special_tokens=False),
+                )
+
+        kimi()
 
         def tiktoken() -> None:
             from tiktoken import Encoding, get_encoding
@@ -193,7 +218,7 @@ if __name__ == '__main__':
             for model in models:
                 console.print(f'[bold]{model}[/bold] [dim](meta)[/dim]')
                 name = os.path.basename(model).split('.')[0]
-                encoder: Tokenizer = Tokenizer(model)
+                encoder: Tokenizer = Tokenizer(Path(model))
                 gen_lines(
                     'meta',
                     name,
@@ -214,12 +239,12 @@ if __name__ == '__main__':
 
             models = glob.glob('models/tests/*.json')
             for model in models:
-                console.print(f'[bold]{model}[/bold] [dim](tekken)[/dim]')
                 name = os.path.basename(model).split('.')[0]
                 with open(model, encoding='utf-8') as f:
                     text = f.read()
                     if text.find('"version": "v3"') == -1:
                         continue
+                console.print(f'[bold]{model}[/bold] [dim](tekken)[/dim]')
                 str.replace(text, '\n', '\\n')
                 encoder = MistralTokenizer.from_file(model)
                 gen_lines(

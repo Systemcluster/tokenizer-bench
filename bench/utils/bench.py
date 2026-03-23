@@ -165,6 +165,18 @@ benchmarks = OrderedDict([
             'inf': ['utf8 sequence'],
         }),
     ])),
+    ('gpt_oss', OrderedDict([
+        ('kitoken', {
+            'model': 'models/gpt_oss.json',
+            'slow': [],
+            'inf': [],
+        }),
+        ('tokenizers', {
+            'model': 'models/gpt_oss.json',
+            'slow': [],
+            'inf': [],
+        }),
+    ])),
     ('llama2', OrderedDict([
         ('kitoken', {
             'model': 'models/llama2.model',
