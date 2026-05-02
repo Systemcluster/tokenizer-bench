@@ -2,7 +2,7 @@
 name = "tokenizer-bench"
 description = "Benchmark for tokenizers."
 version = "0.0.0"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12,<3.14"
 
 authors = [{ name = "Christian Sdunek", email = "me@systemcluster.me" }]
 urls = { repository = "https://github.com/Systemcluster/tokenizer-bench" }
@@ -10,25 +10,27 @@ urls = { repository = "https://github.com/Systemcluster/tokenizer-bench" }
 dependencies = [
     "kitoken",
     "sentencepiece>=0.2.1",
-    "tokenizers>=0.22.2",
+    "tokenizers",
     "tiktoken>=0.12.0",
-    "mistral-common>=1.10.0",
+    "mistral-common>=1.11.0",
     "llama-models>=0.3.0",
-    "transformers>=5.3.0",
+    "transformers>=5.6.2",
     "blobfile",
     # "gpt_bpe", # vendored
     "scipy>=1.17.1",
     "numpy",
-    "rich>=14.3.3",
+    "rich>=15.0.0",
     "rich-argparse>=1.7.2",
-    "pip>=26.0.1",
+    "pip>=26.1.0",
     "pywin32>=311; platform_system=='Windows'",
 ]
 
 [project.optional-dependencies]
 llama = [
-    "llama-cpp-python>=0.3.16",
+    "llama-cpp-python>=0.3.21",
 ]
+[project.dependency-groups]
+dev = ["ruff>=0.11", "pyright>=1.1"]
 
 [tool.pdm]
 distribution = false
@@ -37,8 +39,6 @@ allow-prereleases = false
 [tool.pdm.dev-dependencies]
 dev = ["ruff>=0.11", "pyright>=1.1"]
 [tool.rye]
-dev-dependencies = ["ruff>=0.11", "pyright>=1.1"]
-[tool.uv]
 dev-dependencies = ["ruff>=0.11", "pyright>=1.1"]
 
 [[tool.pdm.source]]

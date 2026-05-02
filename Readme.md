@@ -84,13 +84,12 @@ The following tokenizers are included in this benchmark:
 - [Kitoken](https://github.com/Systemcluster/kitoken)
 - [SentencePiece](https://github.com/google/sentencepiece) <sup>1</sup>
 - [Tokenizers](https://github.com/huggingface/tokenizers)
-- [Tiktoken](https://github.com/openai/tiktoken) <sup>2</sup>
+- [Tiktoken](https://github.com/openai/tiktoken) <sup>1</sup>
 - [Tekken](https://docs.mistral.ai/guides/tokenization) <sup>uses Tiktoken internally</sup>
 - [gpt_bpe](https://github.com/wbrown/gpt_bpe) <sup>1</sup>
-- [llama.cpp](https://github.com/ggerganov/llama.cpp) <sup>2, optional, very slow</sup>
+- [llama.cpp](https://github.com/ggerganov/llama.cpp) <sup>1, optional</sup>
 
 <sup>1: doesn't complete `UTF-8 Sequence` with some models</sup>\
-<sup>2: doesn't complete `UTF-8 Sequence` with any model unless raising timeout</sub>
 <sup></sub>
 
 This benchmark does not verify the correctness of tokenization results. Some tokenizers targeting the same model as others might produce different results for the same inputs. Use the test data generation utility to compare outputs manually if needed.

@@ -105,23 +105,23 @@ if __name__ == '__main__':
             list[int],
         ],
         decode: Callable[[list[int]], str],
+        data: str,
     ) -> None:
-        for data in ['utf8']:
-            text = (
-                open(f'data/{data}_input.txt', encoding='utf-8', newline='\n')
-                .read()
-                .replace('\\n', '\n')
-                .replace('\\s', ' ')
-            )
-            output = encode(text)
-            decoded = decode(output)
-            os.makedirs(f'outputs/{model}', exist_ok=True)
-            with open(f'outputs/{model}/{data}_tokens_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
-                f.write(', '.join([str(token) for token in output]))
-            if len(decoded) != len(text) or text != decoded:
-                logger.info(f'{model}: {name}: {data}_input.txt: {len(text)} != {len(decoded)} or text not equal')
-                with open(f'outputs/{model}/{data}_output_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
-                    f.write(decoded)
+        text = (
+            open(f'data/{data}_input.txt', encoding='utf-8', newline='\n')
+            .read()
+            .replace('\\n', '\n')
+            .replace('\\s', ' ')
+        )
+        output = encode(text)
+        decoded = decode(output)
+        os.makedirs(f'outputs/{model}', exist_ok=True)
+        with open(f'outputs/{model}/{data}_tokens_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
+            f.write(', '.join([str(token) for token in output]))
+        if len(decoded) != len(text) or text != decoded:
+            logger.info(f'{model}: {name}: {data}_input.txt: {len(text)} != {len(decoded)} or text not equal')
+            with open(f'outputs/{model}/{data}_output_{name}.txt', 'w', encoding='utf-8', newline='\n') as f:
+                f.write(decoded)
 
     try:
         # generate outputs for all models
@@ -136,7 +136,7 @@ if __name__ == '__main__':
                 encoder: SentencePieceProcessor = SentencePieceProcessor()
                 encoder.Load(model)
                 gen_lines('sentencepiece', name, encoder.EncodeAsIds, encoder.Decode)
-                gen_full('sentencepiece', name, encoder.EncodeAsIds, encoder.Decode)
+                gen_full('sentencepiece', name, encoder.EncodeAsIds, encoder.Decode, 'utf8')
 
         sentencepiece()
 
@@ -148,7 +148,7 @@ if __name__ == '__main__':
                 name = os.path.basename(model).split('.')[0]
                 with open(model, encoding='utf-8') as f:
                     text = f.read()
-                    if text.find('"version": "v3"') != -1:
+                    if text.find('"version": "v') != -1:
                         continue
                 console.print(f'[bold]{model}[/bold] [dim](tokenizers)[/dim]')
                 str.replace(text, '\n', '\\n')
@@ -165,6 +165,7 @@ if __name__ == '__main__':
                     name,
                     lambda i, encoder=encoder: cast(Encoding, encoder.encode(i, add_special_tokens=False)).ids,
                     lambda i, encoder=encoder: encoder.decode(i, skip_special_tokens=False),
+                    'utf8',
                 )
 
         tokenizers()
@@ -189,6 +190,7 @@ if __name__ == '__main__':
                     name,
                     lambda i, encoder=encoder: encoder.encode(i, add_special_tokens=False),
                     lambda i, encoder=encoder: encoder.decode(i, skip_special_tokens=False),
+                    'utf8',
                 )
 
         kimi()
@@ -207,7 +209,7 @@ if __name__ == '__main__':
                     lambda i, encoder=encoder: encoder.encode(i, allowed_special='all'),
                     encoder.decode,
                 )
-                gen_full('tiktoken', name, encoder.encode, encoder.decode)
+                gen_full('tiktoken', name, encoder.encode, encoder.decode, 'utf8')
 
         tiktoken()
 
@@ -230,6 +232,7 @@ if __name__ == '__main__':
                     name,
                     lambda i, encoder=encoder: encoder.encode(i, bos=False, eos=False),
                     lambda i, encoder=encoder: encoder.decode(i),
+                    'utf8',
                 )
 
         meta()
@@ -242,7 +245,7 @@ if __name__ == '__main__':
                 name = os.path.basename(model).split('.')[0]
                 with open(model, encoding='utf-8') as f:
                     text = f.read()
-                    if text.find('"version": "v3"') == -1:
+                    if text.find('"version": "v') == -1:
                         continue
                 console.print(f'[bold]{model}[/bold] [dim](tekken)[/dim]')
                 str.replace(text, '\n', '\\n')
@@ -262,6 +265,7 @@ if __name__ == '__main__':
                         list[int], encoder.instruct_tokenizer.tokenizer.encode(i, False, False)
                     ),
                     lambda i, encoder=encoder: encoder.decode(i),
+                    'utf8',
                 )
 
         # workaround for github.com/mistralai/mistral-common/pull/33

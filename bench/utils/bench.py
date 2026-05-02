@@ -165,18 +165,6 @@ benchmarks = OrderedDict([
             'inf': ['utf8 sequence'],
         }),
     ])),
-    ('gpt_oss', OrderedDict([
-        ('kitoken', {
-            'model': 'models/gpt_oss.json',
-            'slow': [],
-            'inf': [],
-        }),
-        ('tokenizers', {
-            'model': 'models/gpt_oss.json',
-            'slow': [],
-            'inf': [],
-        }),
-    ])),
     ('llama2', OrderedDict([
         ('kitoken', {
             'model': 'models/llama2.model',
@@ -204,30 +192,6 @@ benchmarks = OrderedDict([
             'inf': ['utf8 sequence'],
         }),
     ])),
-    ('llama32', OrderedDict([
-        ('kitoken', {
-            'model': 'models/llama32.json',
-            'slow': [],
-            'inf': [],
-        }),
-        ('tokenizers', {
-            'model': 'models/llama32.json',
-            'slow': [],
-            'inf': [],
-        }),
-    ])),
-    ('llama33', OrderedDict([
-        ('kitoken', {
-            'model': 'models/llama33.json',
-            'slow': [],
-            'inf': [],
-        }),
-        ('tokenizers', {
-            'model': 'models/llama33.json',
-            'slow': [],
-            'inf': [],
-        }),
-    ])),
     ('llama4', OrderedDict([
         ('kitoken', {
             'model': 'models/llama4.meta',
@@ -240,7 +204,7 @@ benchmarks = OrderedDict([
             'inf': [],
         }),
         ('tokenizers', {
-            'model': 'models/llama33.json',
+            'model': 'models/llama4.json',
             'slow': [],
             'inf': [],
         }),
@@ -257,23 +221,6 @@ benchmarks = OrderedDict([
             'inf': [],
         }),
     ])),
-    ('xlnet', OrderedDict([
-        ('kitoken', {
-            'model': 'models/xlnet_base_cased.model',
-            'slow': [],
-            'inf': [],
-        }),
-        ('sentencepiece', {
-            'model': 'models/xlnet_base_cased.model',
-            'slow': ['utf8 sequence'],
-            'inf': [],
-        }),
-        ('tokenizers', {
-            'model': 'models/xlnet_base_cased.json',
-            'slow': [],
-            'inf': [],
-        }),
-    ])),
     ('mistral', OrderedDict([
         ('kitoken', {
             'model': 'models/mistral2410-tekken.json',
@@ -287,6 +234,23 @@ benchmarks = OrderedDict([
         }),
         ('tokenizers', {
             'model': 'models/mistral2410.json',
+            'slow': [],
+            'inf': [],
+        })
+    ])),
+    ('gemma3', OrderedDict([
+        ('kitoken', {
+            'model': 'models/gemma3.model',
+            'slow': [],
+            'inf': [],
+        }),
+        ('sentencepiece', {
+            'model': 'models/gemma3.model',
+            'slow': [],
+            'inf': [],
+        }),
+        ('tokenizers', {
+            'model': 'models/gemma3.json',
             'slow': [],
             'inf': [],
         })
