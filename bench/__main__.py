@@ -95,8 +95,10 @@ if __name__ == '__main__':
         help='Show results for previous benchmark runs and exit. (default: False)',
         default=False,
     )
-    argparser.add_argument('--log-level', type=str, help='Log level. (default: INFO)', default='INFO')
-    argparser.add_argument('--help', '-h', action='help', help='Show this help message and exit.')
+    argparser.add_argument('--log-level', type=str,
+                           help='Log level. (default: INFO)', default='INFO')
+    argparser.add_argument('--help', '-h', action='help',
+                           help='Show this help message and exit.')
 
     argparser_bench = argparser.add_argument_group('Benchmark options')
     argparser_bench.add_argument(
@@ -188,37 +190,44 @@ if __name__ == '__main__':
     # verify tokenizer args
     if args.tokenizers:
         args.tokenizers = functools.reduce(
-            operator.add, ([s.strip() for s in t.split(',')] for t in args.tokenizers), []
+            operator.add, ([s.strip() for s in t.split(',')]
+                           for t in args.tokenizers), []
         )
         for tok in args.tokenizers:
             if tok not in tokenizers:
                 console.print(f'[red]Unknown tokenizer: [bold]{tok}[/][/]')
-                console.print(f'[dim]Available tokenizers:[/dim] {", ".join(f"[blue]{x}[/]" for x in tokenizers)}')
+                console.print(
+                    f'[dim]Available tokenizers:[/dim] {", ".join(f"[blue]{x}[/]" for x in tokenizers)}')
                 exit(1)
 
     # verify model args
     if args.models:
-        args.models = functools.reduce(operator.add, ([s.strip() for s in t.split(',')] for t in args.models), [])
+        args.models = functools.reduce(
+            operator.add, ([s.strip() for s in t.split(',')] for t in args.models), [])
         for model in args.models:
             if model not in benchmarks:
                 console.print(f'[red]Unknown model: [bold]{model}[/][/]')
-                console.print(f'[dim]Available models:[/dim] {", ".join(f"[blue]{x}[/]" for x in benchmarks)}')
+                console.print(
+                    f'[dim]Available models:[/dim] {", ".join(f"[blue]{x}[/]" for x in benchmarks)}')
                 exit(1)
 
     # verify dataset args
     if args.datasets:
-        args.datasets = functools.reduce(operator.add, ([s.strip() for s in t.split(',')] for t in args.datasets), [])
+        args.datasets = functools.reduce(
+            operator.add, ([s.strip() for s in t.split(',')] for t in args.datasets), [])
         for dataset in args.datasets:
             if dataset not in datasets:
                 console.print(f'[red]Unknown dataset: [bold]{dataset}[/][/]')
-                console.print(f'[dim]Available datasets:[/dim] {", ".join(f"[blue]{x}[/]" for x in datasets)}')
+                console.print(
+                    f'[dim]Available datasets:[/dim] {", ".join(f"[blue]{x}[/]" for x in datasets)}')
                 exit(1)
 
     def do_verify_imports() -> None:
         from vendor.gpt_bpe import BPETokenizer  # type: ignore # noqa: F401
 
+        from fastokens import Tokenizer as FastokensTokenizer  # type: ignore # noqa: F401
+        from gigatoken import Tokenizer as GigatokenTokenizer  # type: ignore # noqa: F401
         from kitoken import Kitoken  # type: ignore # noqa: F401
-        from llama_cpp import Llama, LlamaTokenizer  # type: ignore # noqa: F401
         from sentencepiece import SentencePieceProcessor  # type: ignore # noqa: F401
         from tiktoken.core import Encoding  # type: ignore # noqa: F401
         from tokenizers import Tokenizer  # type: ignore # noqa: F401
@@ -244,10 +253,12 @@ if __name__ == '__main__':
                     if args.datasets and name not in args.datasets:
                         continue
                     console.print(f'[blue bold]{tok} - {model} - {name}[/]')
-                    timings = Timings.from_dir(f'{tok} - {model} - {name}', args.timings_dir)
+                    timings = Timings.from_dir(
+                        f'{tok} - {model} - {name}', args.timings_dir)
                     timings.print_timings()
                     if args.compare_dir:
-                        compare = Timings.from_dir(f'{tok} - {model} - {name}', args.compare_dir)
+                        compare = Timings.from_dir(
+                            f'{tok} - {model} - {name}', args.compare_dir)
                         compare.name = os.path.basename(args.compare_dir)
                         timings.print_timings_compare(compare)
         exit(0)
@@ -262,32 +273,32 @@ if __name__ == '__main__':
                 if args.tokenizers and tok not in args.tokenizers:
                     logger.info(
                         f'Skipping unselected tokenizer: {
-                                model} - {tok}'
+                            model} - {tok}'
                     )
                     continue
                 for name, file in datasets.items():
                     if args.datasets and name not in args.datasets:
                         logger.info(
                             f'Skipping unselected dataset: {
-                                    model} - {tok} - {name}'
+                                model} - {tok} - {name}'
                         )
                         continue
                     if args.skip_slow and name in params['slow']:
                         logger.info(
                             f'Skipping slow benchmark: {
-                                    model} - {tok} - {name}'
+                                model} - {tok} - {name}'
                         )
                         continue
                     if args.only_slow and name not in params['slow']:
                         logger.info(
                             f'Skipping non-slow benchmark: {
-                                    model} - {tok} - {name}'
+                                model} - {tok} - {name}'
                         )
                         continue
                     if not args.allow_inf and name in params['inf']:
                         logger.info(
                             f'Skipping infinite benchmark: {
-                                    model} - {tok} - {name}'
+                                model} - {tok} - {name}'
                         )
                         continue
                     p: Process | None = None
@@ -325,13 +336,14 @@ if __name__ == '__main__':
                                 print()
                                 logger.error(
                                     f'Timeout for {
-                                    model} - {tok} - {name} after {args.timeout}s'
+                                        model} - {tok} - {name} after {args.timeout}s'
                                 )
                                 p.terminate()
                                 while p.is_alive():
                                     sleep(0.1)
                             elif result is None and p.exitcode is not None and p.exitcode != 0:
-                                logger.error(f'{model} - {tok} - {name} exited with code {p.exitcode}')
+                                logger.error(
+                                    f'{model} - {tok} - {name} exited with code {p.exitcode}')
                                 p.close()
                     except KeyboardInterrupt as e:
                         print()

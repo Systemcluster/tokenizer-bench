@@ -62,6 +62,24 @@ def run_bench_kitoken(
     run(timings, compare, name, model, text, iters, warmup)
 
 
+def run_bench_fastokens(
+    timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
+) -> None:
+    from ..benches.fastokens import run
+
+    text = open(text, encoding='utf-8', newline='\n').read()
+    run(timings, compare, name, model, text, iters, warmup)
+
+
+def run_bench_gigatoken(
+    timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
+) -> None:
+    from ..benches.gigatoken import run
+
+    text = open(text, encoding='utf-8', newline='\n').read()
+    run(timings, compare, name, model, text, iters, warmup)
+
+
 def run_bench_tiktoken(
     timings: str, compare: str | None, name: str, model: str, text: str, iters: int, warmup: int
 ) -> None:
@@ -133,6 +151,8 @@ datasets = OrderedDict([
 
 tokenizers = OrderedDict([
     ('kitoken', run_bench_kitoken),
+    ('fastokens', run_bench_fastokens),
+    ('gigatoken', run_bench_gigatoken),
     ('tiktoken', run_bench_tiktoken),
     ('sentencepiece', run_bench_sentencepiece),
     ('tokenizers', run_bench_tokenizers),
@@ -145,6 +165,11 @@ tokenizers = OrderedDict([
 benchmarks = OrderedDict([
     ('gpt2', OrderedDict([
         ('kitoken', {
+            'model': 'models/gpt2.json',
+            'slow': [],
+            'inf': [],
+        }),
+        ('gigatoken', {
             'model': 'models/gpt2.json',
             'slow': [],
             'inf': [],
@@ -167,6 +192,11 @@ benchmarks = OrderedDict([
     ])),
     ('llama2', OrderedDict([
         ('kitoken', {
+            'model': 'models/llama2.model',
+            'slow': [],
+            'inf': [],
+        }),
+        ('gigatoken', {
             'model': 'models/llama2.model',
             'slow': [],
             'inf': [],
@@ -198,6 +228,16 @@ benchmarks = OrderedDict([
             'slow': [],
             'inf': [],
         }),
+        ('fastokens', {
+            'model': 'models/llama4.json',
+            'slow': [],
+            'inf': [],
+        }),
+        ('gigatoken', {
+            'model': 'models/llama4.json',
+            'slow': [],
+            'inf': [],
+        }),
         ('meta', {
             'model': 'models/llama4.meta',
             'slow': ['utf8 sequence'],
@@ -215,6 +255,11 @@ benchmarks = OrderedDict([
             'slow': [],
             'inf': [],
         }),
+        ('gigatoken', {
+            'model': 'models/cl100k_base.tiktoken',
+            'slow': [],
+            'inf': [],
+        }),
         ('tiktoken', {
             'model': 'cl100k_base',
             'slow': ['utf8 sequence'],
@@ -224,6 +269,16 @@ benchmarks = OrderedDict([
     ('mistral', OrderedDict([
         ('kitoken', {
             'model': 'models/mistral2410-tekken.json',
+            'slow': [],
+            'inf': [],
+        }),
+        ('fastokens', {
+            'model': 'models/mistral2410.json',
+            'slow': [],
+            'inf': [],
+        }),
+        ('gigatoken', {
+            'model': 'models/mistral2410.json',
             'slow': [],
             'inf': [],
         }),
@@ -241,6 +296,11 @@ benchmarks = OrderedDict([
     ('gemma3', OrderedDict([
         ('kitoken', {
             'model': 'models/gemma3.model',
+            'slow': [],
+            'inf': [],
+        }),
+        ('gigatoken', {
+            'model': 'models/gemma3.json',
             'slow': [],
             'inf': [],
         }),

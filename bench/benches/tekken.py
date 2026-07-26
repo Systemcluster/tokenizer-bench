@@ -13,4 +13,4 @@ def run(timings: str, compare: str | None, name: str, model: str, text: str, ite
             with timing_iteration:
                 for _ in range(10):
                     encoder.instruct_tokenizer.tokenizer.encode(
-                        text, True, True)
+                        text, False, False)

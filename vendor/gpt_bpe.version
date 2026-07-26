@@ -1,0 +1,10 @@
+upstream=https://github.com/wbrown/gpt_bpe
+commit=1571a6e8ad2da8f9a5b3ef7d8875b304f9e274f2
+commit_date=2025-07-09T11:11:31-05:00
+build_date=2026-07-26
+go=1.26.5
+zig=0.16.0
+patches=fix lib/library.go tokenize success check; remove timed-path debug output
+darwin_arm64_sha256=539ed69cc6db92cf6d427dfc1076e2d6c88c8d4701e9b080582e6c260fafb5d9
+linux_x86_64_sha256=72305ecab1c8bc0841b7c09ae3385e547177cbe67e5c415c09369e090ca042d9
+win32_amd64_sha256=33784df844cef1305f31cc7dbf9e0d7d9a0349823f3381910d0ab29a27072f7f

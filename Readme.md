@@ -82,6 +82,8 @@ A selection of results is published in the [Kitoken](https://github.com/Systemcl
 The following tokenizers are included in this benchmark:
 
 - [Kitoken](https://github.com/Systemcluster/kitoken)
+- [fastokens](https://github.com/Atero-ai/fastokens)
+- [gigatoken](https://github.com/roedoejet/gigatoken)
 - [SentencePiece](https://github.com/google/sentencepiece) <sup>1</sup>
 - [Tokenizers](https://github.com/huggingface/tokenizers)
 - [Tiktoken](https://github.com/openai/tiktoken) <sup>1</sup>
